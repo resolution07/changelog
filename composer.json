@@ -1,0 +1,16 @@
+{
+  "name": "resolution07/changelog",
+  "description": "Логирование изменения сущностей",
+  "type": "bitrix-d7-module",
+  "authors": [
+    {
+      "name": "Vladamir Mukashev",
+      "email": "apacah@yandex.by",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": ">=8.3",
+    "composer/installers": "^2"
+  }
+}
