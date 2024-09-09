@@ -7,7 +7,7 @@ namespace Resolution\Changelog\Exceptions;
 
 use Exception;
 
-class MaximumChannelException extends Exception
+class MaximumChannelCountException extends Exception
 {
 
 }

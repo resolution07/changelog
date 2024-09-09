@@ -6,12 +6,12 @@ declare(strict_types=1);
 namespace Resolution\Changelog\Channels\MySQL;
 
 use Exception;
-use Resolution\Changelog\Channels\ChannelInterface;
+use Resolution\Changelog\Channels\WriteChannelInterface;
 use Resolution\Changelog\Event;
 use Resolution\Changelog\Exceptions\SendEventException;
 use Resolution\Changelog\Tables\ChangelogTable;
 
-class Channel implements ChannelInterface
+class WriteChannel implements WriteChannelInterface
 {
     public function send(Event $event): true
     {
@@ -34,8 +34,8 @@ class Channel implements ChannelInterface
             'ENTITY_NAME' => $event->getEntityName(),
             'OPERATION_TYPE' => $event->getOperationType()->value,
             'CHANGES' => $event->getChanges(),
-            'UPDATED_AT' => $event->getUpdatedAt(),
-            'UPDATED_BY' => $event->getUpdatedBy()
+            'TIMESTAMP' => $event->getTimestamp(),
+            'CREATED_BY' => $event->getCreatedBy()
         ]);
     }
 }

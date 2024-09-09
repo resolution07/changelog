@@ -31,9 +31,9 @@ class ChangelogTable extends DataManager
                 ->configureRequired(),
             (new TextField('CHANGES'))
                 ->configureRequired(),
-            (new IntegerField('UPDATED_AT'))
+            (new IntegerField('TIMESTAMP'))
                 ->configureRequired(),
-            (new IntegerField('UPDATED_BY'))
+            (new IntegerField('CREATED_BY'))
                 ->configureRequired(),
         ];
     }

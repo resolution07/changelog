@@ -9,7 +9,7 @@ use Resolution\Changelog\Event;
 use Resolution\Changelog\Exceptions\SendEventException;
 
 /** Общий интерфейс каналов отправки */
-interface ChannelInterface
+interface WriteChannelInterface
 {
     /**
      * Отправляет переданное событие по конкретному каналу

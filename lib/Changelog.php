@@ -8,10 +8,10 @@ namespace Resolution\Changelog;
 use Bitrix\Main\Error;
 use Bitrix\Main\Result;
 use Exception;
-use Resolution\Changelog\Channels\ChannelInterface;
-use Resolution\Changelog\Exceptions\MaximumChannelException;
+use Resolution\Changelog\Channels\WriteChannelInterface;
+use Resolution\Changelog\Exceptions\MaximumChannelCountException;
 
-final class History
+final class Changelog
 {
     public const int MAX_CHANNEL_COUNT = 20;
 
@@ -19,8 +19,8 @@ final class History
     private Result $result;
 
     /**
-     * @param array<ChannelInterface> $channels каналы истории
-     * @throws MaximumChannelException если превышено допустимое количество каналов
+     * @param array<WriteChannelInterface> $channels каналы истории
+     * @throws MaximumChannelCountException если превышено допустимое количество каналов
      */
     public function __construct(array $channels)
     {
@@ -29,15 +29,15 @@ final class History
     }
 
     /**
-     * Добавляет новый канал отправки событий истории
-     * @param ChannelInterface $channel
+     * Добавляет новый канал отправки событий
+     * @param WriteChannelInterface $channel
      * @return $this
-     * @throws MaximumChannelException если будет превышено допустимое количество каналов
+     * @throws MaximumChannelCountException если будет превышено допустимое количество каналов
      */
-    public function addChannel(ChannelInterface $channel): History
+    public function appendChannel(WriteChannelInterface $channel): Changelog
     {
         if (count($this->channels) === self::MAX_CHANNEL_COUNT) {
-            throw new MaximumChannelException();
+            throw new MaximumChannelCountException();
         }
 
         $this->channels[] = $channel;
@@ -54,11 +54,11 @@ final class History
     }
 
     /**
-     * Отправляет переданное событие по каналам истории
+     * Отправляет переданное событие по каналам
      * @param Event $event
      * @return $this
      */
-    public function send(Event $event): History
+    public function sendEvent(Event $event): Changelog
     {
         foreach ($this->channels as $channel) {
             $this->sendEventByChannel($event, $channel);
@@ -67,7 +67,7 @@ final class History
         return $this;
     }
 
-    private function sendEventByChannel(Event $event, ChannelInterface $channel): void
+    private function sendEventByChannel(Event $event, WriteChannelInterface $channel): void
     {
         try {
             $channel->send($event);
@@ -79,12 +79,12 @@ final class History
     /**
      * @param array $channels
      * @return void
-     * @throws MaximumChannelException
+     * @throws MaximumChannelCountException
      */
     private function setupChannels(array $channels): void
     {
         if (count($channels) > self::MAX_CHANNEL_COUNT) {
-            throw new MaximumChannelException();
+            throw new MaximumChannelCountException();
         }
 
         $this->channels = $channels;

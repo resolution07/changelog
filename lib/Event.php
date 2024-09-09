@@ -5,7 +5,6 @@ declare(strict_types=1);
 
 namespace Resolution\Changelog;
 
-use Resolution\Changelog\Exceptions\MaximumChangesSizeException;
 
 final readonly class Event
 {
@@ -13,18 +12,17 @@ final readonly class Event
      * @param int $entityId идентификатор сущности
      * @param string $entityName название сущности
      * @param OperationTypeEnum $operationType тип операции
-     * @param string $changes измененные данные
-     * ВАЖНО! Нужно следить за размером строки в хранилище.
-     * @param int $updatedAt временная метка изменений
-     * @param int $updatedBy кем изменено
+     * @param string $changes измененные данные (ВАЖНО! Нужно следить за размером строки в хранилище)
+     * @param int $timestamp временная метка изменений
+     * @param int $createdBy кем создано
      */
     public function __construct(
         private int $entityId,
         private string $entityName,
         private OperationTypeEnum $operationType,
         private string $changes,
-        private int $updatedAt,
-        private int $updatedBy
+        private int $timestamp,
+        private int $createdBy
     ) {
     }
 
@@ -48,13 +46,13 @@ final readonly class Event
         return $this->changes;
     }
 
-    public function getUpdatedAt(): int
+    public function getTimestamp(): int
     {
-        return $this->updatedAt;
+        return $this->timestamp;
     }
 
-    public function getUpdatedBy(): int
+    public function getCreatedBy(): int
     {
-        return $this->updatedBy;
+        return $this->createdBy;
     }
 }
