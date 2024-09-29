@@ -6,6 +6,8 @@ declare(strict_types=1);
 namespace Resolution\Changelog;
 
 
+use DateTimeImmutable;
+
 final readonly class Event
 {
     /**
@@ -13,7 +15,7 @@ final readonly class Event
      * @param string $entityName название сущности
      * @param OperationTypeEnum $operationType тип операции
      * @param string $changes измененные данные (ВАЖНО! Нужно следить за размером строки в хранилище)
-     * @param int $timestamp временная метка изменений
+     * @param DateTimeImmutable $dateTime дата внесения изменений
      * @param int $createdBy кем создано
      */
     public function __construct(
@@ -21,7 +23,7 @@ final readonly class Event
         private string $entityName,
         private OperationTypeEnum $operationType,
         private string $changes,
-        private int $timestamp,
+        private DateTimeImmutable $dateTime,
         private int $createdBy
     ) {
     }
@@ -46,9 +48,9 @@ final readonly class Event
         return $this->changes;
     }
 
-    public function getTimestamp(): int
+    public function getDateTime(): DateTimeImmutable
     {
-        return $this->timestamp;
+        return $this->dateTime;
     }
 
     public function getCreatedBy(): int

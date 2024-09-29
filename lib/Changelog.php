@@ -14,7 +14,6 @@ use Resolution\Changelog\Exceptions\MaximumChannelCountException;
 final class Changelog
 {
     public const int MAX_CHANNEL_COUNT = 20;
-
     private array $channels;
     private Result $result;
 
@@ -39,7 +38,6 @@ final class Changelog
         if (count($this->channels) === self::MAX_CHANNEL_COUNT) {
             throw new MaximumChannelCountException();
         }
-
         $this->channels[] = $channel;
         return $this;
     }
@@ -63,7 +61,6 @@ final class Changelog
         foreach ($this->channels as $channel) {
             $this->sendEventByChannel($event, $channel);
         }
-
         return $this;
     }
 
@@ -86,7 +83,6 @@ final class Changelog
         if (count($channels) > self::MAX_CHANNEL_COUNT) {
             throw new MaximumChannelCountException();
         }
-
         $this->channels = $channels;
     }
 }

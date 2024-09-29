@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 namespace Resolution\Changelog\Channels\MySQL;
 
+use Bitrix\Main\Type\DateTime;
 use Exception;
 use Resolution\Changelog\Channels\WriteChannelInterface;
 use Resolution\Changelog\Event;
@@ -20,7 +21,6 @@ class WriteChannel implements WriteChannelInterface
         } catch (Exception $e) {
             throw new SendEventException($e->getMessage(), $e->getCode(), $e);
         }
-
         return true;
     }
 
@@ -34,7 +34,7 @@ class WriteChannel implements WriteChannelInterface
             'ENTITY_NAME' => $event->getEntityName(),
             'OPERATION_TYPE' => $event->getOperationType()->value,
             'CHANGES' => $event->getChanges(),
-            'TIMESTAMP' => $event->getTimestamp(),
+            'EVENT_DATE_TIME' => DateTime::createFromTimestamp($event->getDateTime()->getTimestamp()),
             'CREATED_BY' => $event->getCreatedBy()
         ]);
     }

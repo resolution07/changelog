@@ -8,11 +8,10 @@ namespace Resolution\Changelog;
 use Resolution\Changelog\Channels\ReadChannelInterface;
 use Resolution\Changelog\Exceptions\EventReadException;
 
-class Timeline
+final readonly class Timeline
 {
     public const int MIN_PAGE_SIZE = 10;
     public const int MAX_PAGE_SIZE = 50;
-
     private ReadChannelInterface $channel;
 
     public function __construct(ReadChannelInterface $channel)
@@ -28,27 +27,22 @@ class Timeline
      * @return TimelinePage
      * @throws EventReadException
      */
-    public function getPage(string $entityName, int $offset = 1, int $limit = 10): TimelinePage
+    public function getPage(string $entityName, int $limit, int $offset): TimelinePage
     {
-        if ($offset < 1) {
-            $offset = 1;
-        }
-
         if ($limit < self::MIN_PAGE_SIZE) {
             $limit = self::MIN_PAGE_SIZE;
         }
-
         if ($limit > self::MAX_PAGE_SIZE) {
             $limit = self::MAX_PAGE_SIZE;
         }
-
+        if ($offset < 0) {
+            $offset = 0;
+        }
         $totalCount = $this->channel->getTotalEventsCount($entityName);
-        $events = $this->channel->getEvents($entityName, $offset, $limit);
-
+        $events = $this->channel->getEvents($entityName, $limit, $offset);
         return new TimelinePage(
             $totalCount,
             $events
         );
     }
-
 }

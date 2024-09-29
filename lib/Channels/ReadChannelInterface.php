@@ -22,10 +22,10 @@ interface ReadChannelInterface
     /**
      * Возвращает список событий с пагинацией по указанной сущности
      * @param string $entityName
-     * @param int $page
-     * @param int $pageSize
+     * @param int $limit
+     * @param int $offset
      * @return array<Event>
      * @throws EventReadException
      */
-    public function getEvents(string $entityName, int $page, int $pageSize): array;
+    public function getEvents(string $entityName, int $limit, int $offset): array;
 }

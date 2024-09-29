@@ -8,7 +8,7 @@ namespace Resolution\Changelog\Channels;
 use Resolution\Changelog\Event;
 use Resolution\Changelog\Exceptions\SendEventException;
 
-/** Общий интерфейс каналов отправки */
+/** Общий интерфейс каналов записи */
 interface WriteChannelInterface
 {
     /**

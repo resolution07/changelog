@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+\Bitrix\Main\Loader::includeModule('resolution.changelog');
+
 return [
     'controllers' => [
         'value' => [

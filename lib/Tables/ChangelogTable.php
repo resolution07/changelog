@@ -6,6 +6,7 @@ declare(strict_types=1);
 namespace Resolution\Changelog\Tables;
 
 use Bitrix\Main\ORM\Data\DataManager;
+use Bitrix\Main\ORM\Fields\DatetimeField;
 use Bitrix\Main\ORM\Fields\IntegerField;
 use Bitrix\Main\ORM\Fields\StringField;
 use Bitrix\Main\ORM\Fields\TextField;
@@ -31,7 +32,7 @@ class ChangelogTable extends DataManager
                 ->configureRequired(),
             (new TextField('CHANGES'))
                 ->configureRequired(),
-            (new IntegerField('TIMESTAMP'))
+            (new DatetimeField('EVENT_DATE_TIME'))
                 ->configureRequired(),
             (new IntegerField('CREATED_BY'))
                 ->configureRequired(),

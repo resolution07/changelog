@@ -9,57 +9,84 @@
 
 ```bash
 composer require resolution07/changelog
+
 ```
 
 ## Использование
 
-Ниже приведен пример использования модуля Resolution\Changelog для записи события в журнал изменений о каналу MySQL:
+## Добавление события
+
+Ниже приведен пример использования модуля Resolution\Changelog для записи события в журнал изменений по каналу MySQL:
 
 ```php
 <?php
-
-use Resolution\Changelog\Event;
-use Resolution\Changelog\History;
-use Resolution\Changelog\OperationTypeEnum;
-use Resolution\Changelog\Channels\MySQL\Channel;
+declare(strict_types=1);
 use Bitrix\Main\Engine\CurrentUser;
-
-// Создание нового события
+use Resolution\Changelog\Changelog;
+use Resolution\Changelog\Channels\MySQL\WriteChannel;
+use Resolution\Changelog\Event;
+use Resolution\Changelog\OperationTypeEnum;
 $event = new Event(
-    1,                                        // ID сущности
-    'test_entity',                            // Тип сущности
-    OperationTypeEnum::CREATE,                // Тип операции (CREATE, UPDATE, DELETE и т.д.)
-    json_encode(['test' => 'test']),          // Данные для записи (в формате JSON)
-    time(),                                   // Временная метка операции
-    (int)CurrentUser::get()->getId() ?? 0     // ID пользователя, выполняющего операцию
+    1,
+    'someEntity',
+    OperationTypeEnum::CREATE,
+    json_encode(['someField' => 'someValue'], JSON_THROW_ON_ERROR),
+    new DateTimeImmutable(),
+    (int)CurrentUser::get()->getId()
 );
-
-// Отправка события в канал истории (в данном случае MySQL)
-$result = (new History([new Channel()]))->send($event)->getResult();
-
-// Вывод результата операции
+$result = (new Changelog([new WriteChannel()]))
+    ->sendEvent($event)
+    ->getResult();
 echo (int)$result->isSuccess();
 ```
 
-## Параметры
+#### Параметры:
 
 - ID сущности (int): Уникальный идентификатор сущности, которая регистрируется.
 - Тип сущности (string): Строковый идентификатор типа сущности (например, test_entity).
-- Тип операции (OperationTypeEnum): Тип выполненной операции (CREATE, UPDATE, DELETE).
-- Данные (string): JSON-строка, содержащая данные, относящиеся к операции.
-- Временная метка (int): Unix-время, указывающее, когда была выполнена операция.
+- Тип операции (OperationTypeEnum): Тип выполненной операции (CREATE, UPDATE, DELETE, UNDEFINED).
+- Данные (string): JSON-строка, содержащая данные, относящиеся к операции. В целом можно писать все что угодно
+- Дата и время внесения изменений (DateTimeImmutable): Дата и время, указывающее, когда была выполнена операция.
 - ID пользователя (int): ID пользователя, выполнившего операцию. Если пользователь не найден, значение по умолчанию — 0.
 
-## Типы операций
+#### Типы операций
 
 Класс OperationTypeEnum предоставляет предопределенные константы для типов операций, которые можно зарегистрировать:
 
 - CREATE
 - UPDATE
 - DELETE
+- UNDEFINED
+
+## Получение истории
+
+Ниже приведен пример использования модуля Resolution\Changelog для записи события в журнал изменений по каналу MySQL:
+
+```php
+<?php
+declare(strict_types=1);
+use Bitrix\Main\Engine\CurrentUser;
+use Resolution\Changelog\Changelog;
+use Resolution\Changelog\Channels\MySQL\WriteChannel;
+use Resolution\Changelog\Event;
+use Resolution\Changelog\OperationTypeEnum;
+$event = new Event(
+    1,
+    'someEntity',
+    OperationTypeEnum::CREATE,
+    json_encode(['someField' => 'someValue'], JSON_THROW_ON_ERROR),
+    new DateTimeImmutable(),
+    (int)CurrentUser::get()->getId()
+);
+$result = (new Changelog([new WriteChannel()]))
+    ->sendEvent($event)
+    ->getResult();
+echo (int)$result->isSuccess();
+```
 
 ## Каналы
 
-Модуль поддерживает различные каналы для хранения журнала изменений. В примере выше используется канал MySQL, но вы
-можете расширить функциональность, реализовав собственные каналы через интерфейс
-**Resolution\Changelog\Channels\ChannelInterface**.
+Модуль поддерживает различные каналы для записи и чтения изменений. В примере выше используется канал MySQL, но вы
+можете расширить функциональность, реализовав собственные каналы через интерфейсы *
+**Resolution\Changelog\Channels\WriteChannelInterface** и
+**Resolution\Changelog\Channels\ReadChannelInterface**
