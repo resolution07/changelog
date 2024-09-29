@@ -57,4 +57,16 @@ final readonly class Event
     {
         return $this->createdBy;
     }
+
+    public function toArray(): array
+    {
+        return [
+            'entityId' => $this->entityId,
+            'entityName' => $this->entityName,
+            'operationType' => $this->getOperationType()->value,
+            'changes' => $this->getChanges(),
+            'dateTime' => $this->dateTime->format('Y-m-d H:i:s'),
+            'createdBy' => $this->createdBy,
+        ];
+    }
 }

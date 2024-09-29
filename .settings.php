@@ -7,7 +7,7 @@ declare(strict_types=1);
 return [
     'controllers' => [
         'value' => [
-            'defaultNamespace' => '\\Resolution\\Changelog\\Controllers\\',
+            'defaultNamespace' => '\\Resolution\\Changelog\\Controllers',
         ],
         'readonly' => true
     ],
