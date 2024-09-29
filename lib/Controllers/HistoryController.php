@@ -17,10 +17,10 @@ class HistoryController extends Controller
 {
     private const string PAGE_ID = 'timeline';
 
-    public function listAction(string $entityName, PageNavigation $pageNavigation): Page
+    public function allAction(string $entityName, PageNavigation $pageNavigation): Page
     {
         try {
-            return $this->listActionInternal($entityName, $pageNavigation);
+            return $this->allActionInternal($entityName, $pageNavigation);
         } catch (Throwable $e) {
             $this->addError(new Error($e->getMessage()));
             return new Page(
@@ -37,7 +37,7 @@ class HistoryController extends Controller
      * @return Page
      * @throws EventReadException
      */
-    private function listActionInternal(string $entityName, PageNavigation $pageNavigation): Page
+    private function allActionInternal(string $entityName, PageNavigation $pageNavigation): Page
     {
         $timelinePage = TimelineHelper::create()?->getPage(
             $entityName,
@@ -47,8 +47,8 @@ class HistoryController extends Controller
 
         return new Page(
             self::PAGE_ID,
-            $timelinePage?->getEvents() ?? [],
-            $timelinePage?->getTotalCount() ?? 0
+            array_map(static fn($event) => $event->toArray(), $timelinePage->getEvents()),
+            $timelinePage->getTotalCount() ?? 0
         );
     }
 }

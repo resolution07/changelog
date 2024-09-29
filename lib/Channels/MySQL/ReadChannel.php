@@ -2,35 +2,35 @@
 
 declare(strict_types=1);
 
-
 namespace Resolution\Changelog\Channels\MySQL;
 
 use Bitrix\Main\ArgumentException;
 use Bitrix\Main\ObjectPropertyException;
 use Bitrix\Main\SystemException;
+use DateTimeImmutable;
 use Resolution\Changelog\Channels\ReadChannelInterface;
 use Resolution\Changelog\Event;
 use Resolution\Changelog\Exceptions\EventReadException;
+use Resolution\Changelog\Filter;
 use Resolution\Changelog\OperationTypeEnum;
 use Resolution\Changelog\Tables\ChangelogTable;
-use DateTimeImmutable;
 use Throwable;
 
 class ReadChannel implements ReadChannelInterface
 {
-    public function getTotalEventsCount(string $entityName): int
+    public function getTotalEventsCountByFilter(Filter $filter): int
     {
         try {
-            return $this->getTotalEventsCountInternal($entityName);
+            return $this->getTotalEventsCountInternal($filter);
         } catch (Throwable $e) {
             throw new EventReadException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
-    public function getEvents(string $entityName, int $limit, int $offset): array
+    public function getEventsByFilter(Filter $filter, int $limit, int $offset): array
     {
         try {
-            return $this->getEventsInternal($entityName, $limit, $offset);
+            return $this->getEventsInternal($filter, $limit, $offset);
         } catch (Throwable $e) {
             throw new EventReadException($e->getMessage(), $e->getCode(), $e);
         }
@@ -40,35 +40,35 @@ class ReadChannel implements ReadChannelInterface
      * @throws ObjectPropertyException
      * @throws SystemException
      */
-    private function getTotalEventsCountInternal(string $entityName): int
+    private function getTotalEventsCountInternal(Filter $filter): int
     {
-        return ChangelogTable::getCount([
-            '=ENTITY_NAME' => $entityName,
-        ]);
+        return ChangelogTable::getCount($filter->toArray());
     }
 
     /**
-     * @param string $entityName
-     * @param int $offset
+     * @param Filter $filter
      * @param int $limit
+     * @param int $offset
      * @return array
      * @throws ArgumentException
      * @throws ObjectPropertyException
      * @throws SystemException
      */
-    private function getEventsInternal(string $entityName, int $limit, int $offset): array
+    private function getEventsInternal(Filter $filter, int $limit, int $offset): array
     {
         $rawEventsArray = ChangelogTable::getList([
             'select' => ['*'],
-            'filter' => ['=ENTITY_NAME' => $entityName],
+            'filter' => $filter->toArray(),
             'order' => ['EVENT_DATE_TIME' => 'DESC'],
             'limit' => $limit,
             'offset' => $offset
         ])->fetchAll();
+
         foreach ($rawEventsArray as $event) {
             $events[] = new Event(
                 (int)$event['ENTITY_ID'],
                 $event['ENTITY_NAME'],
+                $event['ENTITY_GROUP'],
                 OperationTypeEnum::tryFrom($event['OPERATION_TYPE']) ?? OperationTypeEnum::UNDEFINED,
                 $event['CHANGES'],
                 (new DateTimeImmutable())->setTimestamp($event['EVENT_DATE_TIME']->getTimestamp()),

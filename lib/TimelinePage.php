@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace Resolution\Changelog;
 
 final readonly class TimelinePage

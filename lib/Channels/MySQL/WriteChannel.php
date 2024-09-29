@@ -32,6 +32,7 @@ class WriteChannel implements WriteChannelInterface
         ChangelogTable::add([
             'ENTITY_ID' => $event->getEntityId(),
             'ENTITY_NAME' => $event->getEntityName(),
+            'ENTITY_GROUP' => $event->getEntityGroup(),
             'OPERATION_TYPE' => $event->getOperationType()->value,
             'CHANGES' => $event->getChanges(),
             'EVENT_DATE_TIME' => DateTime::createFromTimestamp($event->getDateTime()->getTimestamp()),

@@ -20,15 +20,19 @@ composer require resolution07/changelog
 
 ```php
 <?php
+
 declare(strict_types=1);
+
 use Bitrix\Main\Engine\CurrentUser;
 use Resolution\Changelog\Changelog;
 use Resolution\Changelog\Channels\MySQL\WriteChannel;
 use Resolution\Changelog\Event;
 use Resolution\Changelog\OperationTypeEnum;
+
 $event = new Event(
     1,
     'someEntity',
+    'someEntityGroup',
     OperationTypeEnum::CREATE,
     json_encode(['someField' => 'someValue'], JSON_THROW_ON_ERROR),
     new DateTimeImmutable(),
@@ -44,8 +48,9 @@ echo (int)$result->isSuccess();
 
 - ID сущности (int): Уникальный идентификатор сущности, которая регистрируется.
 - Тип сущности (string): Строковый идентификатор типа сущности (например, test_entity).
+- Группа сущностей (если есть). Например, если у сущности Order есть связанные сущности Product.
 - Тип операции (OperationTypeEnum): Тип выполненной операции (CREATE, UPDATE, DELETE, UNDEFINED).
-- Данные (string): JSON-строка, содержащая данные, относящиеся к операции. В целом можно писать все что угодно
+- Данные (string): JSON-строка, содержащая данные, относящиеся к операции. В целом можно писать все что угодно.
 - Дата и время внесения изменений (DateTimeImmutable): Дата и время, указывающее, когда была выполнена операция.
 - ID пользователя (int): ID пользователя, выполнившего операцию. Если пользователь не найден, значение по умолчанию — 0.
 
@@ -60,28 +65,41 @@ echo (int)$result->isSuccess();
 
 ## Получение истории
 
-Ниже приведен пример использования модуля Resolution\Changelog для записи события в журнал изменений по каналу MySQL:
+Ниже приведен пример использования модуля Resolution\Changelog для чтения события из журнала изменений по каналу MySQL:
 
 ```php
 <?php
+
 declare(strict_types=1);
-use Bitrix\Main\Engine\CurrentUser;
-use Resolution\Changelog\Changelog;
-use Resolution\Changelog\Channels\MySQL\WriteChannel;
-use Resolution\Changelog\Event;
-use Resolution\Changelog\OperationTypeEnum;
-$event = new Event(
-    1,
-    'someEntity',
-    OperationTypeEnum::CREATE,
-    json_encode(['someField' => 'someValue'], JSON_THROW_ON_ERROR),
-    new DateTimeImmutable(),
-    (int)CurrentUser::get()->getId()
+
+use Resolution\Changelog\Channels\MySQL\ReadChannel;
+use Resolution\Changelog\Filter;
+use Resolution\Changelog\Timeline;
+
+$timeline = new Timeline(new ReadChannel());
+
+$timelinePage = $timeline->getPageByFilter(
+    new Filter(
+        'someEntity',
+        'someEntityGroup'
+    ),
+    10,
+    0
 );
-$result = (new Changelog([new WriteChannel()]))
-    ->sendEvent($event)
-    ->getResult();
-echo (int)$result->isSuccess();
+
+$events = $timelinePage->getEvents();
+
+foreach ($events as $event) {
+    var_dump(
+        $event->getEntityId(),
+        $event->getEntityName(),
+        $event->getEntityGroup(),
+        $event->getOperationType(),
+        $event->getChanges(),
+        $event->getDateTime()->format('Y-m-d H:i:s'),
+        $event->getCreatedBy()
+    );
+}
 ```
 
 ## Каналы

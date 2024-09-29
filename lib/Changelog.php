@@ -13,7 +13,7 @@ use Resolution\Changelog\Exceptions\MaximumChannelCountException;
 
 final class Changelog
 {
-    public const int MAX_CHANNEL_COUNT = 20;
+    public const MAX_CHANNEL_COUNT = 20;
     private array $channels;
     private Result $result;
 
